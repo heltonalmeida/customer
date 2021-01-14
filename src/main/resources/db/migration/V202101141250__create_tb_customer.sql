@@ -1,0 +1,7 @@
+CREATE TABLE tb_customer (
+id INT PRIMARY KEY AUTO_INCREMENT,
+name VARCHAR(100) NOT NULL,
+sexo CHAR(1) NOT NULL,
+dt_birth DATE NOT NULL,
+id_city INT NOT NULL
+);

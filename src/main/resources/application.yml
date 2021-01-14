@@ -1,0 +1,15 @@
+server:  
+  port: ${PORT:4000}
+  servlet:
+    contextPath: /api
+  
+spring:
+  datasource:
+    url: ${DB_URL:jdbc:mysql://localhost:3306/db_customer}
+    username: ${DB_USER:root}
+    password: ${DB_PASSWORD:root}
+  jpa:
+    show-sql: ${SHOW_SQL:false}
+    properties:
+      hibernate:
+        format_sql: true
