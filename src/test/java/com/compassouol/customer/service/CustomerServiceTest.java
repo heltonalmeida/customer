@@ -2,6 +2,7 @@ package com.compassouol.customer.service;
 
 import java.time.LocalDate;
 import java.time.Month;
+import java.util.ArrayList;
 import java.util.Optional;
 
 import org.junit.Assert;
@@ -11,6 +12,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 
 import com.compassouol.customer.dto.CustomerRequestDTO;
 import com.compassouol.customer.dto.CustomerResponseDTO;
@@ -28,6 +33,17 @@ public class CustomerServiceTest {
 	
 	@Mock
 	private CustomerRepository customerRepository;
+	
+	@Test
+	public void findBy_mustReturnCustomerList() {
+	    String name = "Helton";
+	    PageRequest pageRequest = PageRequest.of(0, 10, Sort.Direction.ASC, "id");
+	    Mockito.when(customerRepository.findBy(Mockito.anyString(), Mockito.any())).thenReturn(new PageImpl<>(new ArrayList<>()));
+	    
+	    Page<CustomerResponseDTO> result = customerService.findBy(name, pageRequest);
+	    
+	    Assert.assertNotNull(result);
+	}
 	
 	@Test
 	public void findBy_mustReturnCustomer() {

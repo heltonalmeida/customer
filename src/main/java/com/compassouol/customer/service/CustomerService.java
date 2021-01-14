@@ -3,6 +3,8 @@ package com.compassouol.customer.service;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.compassouol.customer.converter.CustomerConverter;
@@ -31,6 +33,10 @@ public class CustomerService {
 	public void delete(Long id) {
 		findBy(id);
 		customerRepository.deleteById(id);
+	}
+
+	public Page<CustomerResponseDTO> findBy(String name, Pageable page) {
+		return customerRepository.findBy(name, page);
 	}
 
 }
