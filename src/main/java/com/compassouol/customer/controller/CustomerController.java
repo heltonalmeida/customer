@@ -36,7 +36,7 @@ public class CustomerController {
 	@Autowired
 	private CustomerService customerService;
 	
-	@ApiOperation(value = "Recupera as informações do(s) clientes(s).")
+	@ApiOperation(value = "Recupera as informações do(s) cliente(s).")
     @ApiResponses({
             @ApiResponse(code = 200, message = "OK"),
             @ApiResponse(code = 500, message = "Erro interno no servidor")})
