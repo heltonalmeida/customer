@@ -5,6 +5,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import com.compassouol.customer.city.feign.CityClientFeign;
 import com.compassouol.customer.converter.CustomerConverter;
 import com.compassouol.customer.dto.CustomerNameRequestDTO;
 import com.compassouol.customer.dto.CustomerRequestDTO;
@@ -19,6 +20,9 @@ public class CustomerService {
 	@Autowired
 	private CustomerRepository customerRepository;
 	
+	@Autowired
+	private CityClientFeign cityClient;
+	
 	public Page<CustomerResponseDTO> findBy(String name, Pageable page) {
 		return customerRepository.findBy(name, page);
 	}
@@ -29,6 +33,7 @@ public class CustomerService {
 	}
 
 	public CustomerResponseDTO save(CustomerRequestDTO customerRequestDTO) {
+		validateRegisteredCity(customerRequestDTO);
 		Customer customer = CustomerConverter.convert(customerRequestDTO);
 		return CustomerConverter.convert(customerRepository.save(customer));
 	}
@@ -42,6 +47,10 @@ public class CustomerService {
 		Customer customer = findById(id);
 		customer.setName(customerNameRequestDTO.getName());
 		return CustomerConverter.convert(customerRepository.save(customer));
+	}
+	
+	private void validateRegisteredCity(CustomerRequestDTO customerRequestDTO) {
+		cityClient.findBy(customerRequestDTO.getIdCity());
 	}
 	
 	private Customer findById(Long id) {

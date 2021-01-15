@@ -23,12 +23,15 @@ import com.compassouol.customer.dto.ExceptionResponseDTO;
 import com.compassouol.customer.dto.FieldErrorDTO;
 import com.compassouol.customer.dto.FiledExceptionResponseDTO;
 import com.compassouol.customer.exception.GenericException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import feign.FeignException;
 
 @ControllerAdvice
 public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
 
 	private Logger log = LoggerFactory.getLogger(CustomExceptionHandler.class);
-
+	
 	@Override
 	protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex,
 			HttpHeaders headers, HttpStatus status, WebRequest request) {
@@ -36,6 +39,14 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
 		List<FieldErrorDTO> erros = getMessagesOfField(ex);
 		FiledExceptionResponseDTO fieldExceptionResponseDTO = new FiledExceptionResponseDTO(HttpStatus.BAD_REQUEST.value(), erros);
 		return new ResponseEntity<>(fieldExceptionResponseDTO, status);
+	}
+	
+	@ExceptionHandler(Exception.class)
+	protected ResponseEntity<Object> handleException(Exception ex) {
+		log.error("GlobalExceptionHandler", ex);
+		ExceptionResponseDTO responseMessage = new ExceptionResponseDTO(HttpStatus.INTERNAL_SERVER_ERROR.value(),
+				Arrays.asList("Erro interno no servidor"));
+		return new ResponseEntity<>(responseMessage, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 
 	@ExceptionHandler(GenericException.class)
@@ -46,6 +57,23 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
 		String message = getMessage(ex, response);
 		ExceptionResponseDTO exeptionResponseDTO = new ExceptionResponseDTO(status.value(), Arrays.asList(message));
 		return new ResponseEntity<>(exeptionResponseDTO, status);
+	}
+	
+	@ExceptionHandler(FeignException.class)
+	protected ResponseEntity<Object> handleException(FeignException ex) {
+		log.error("FeignExceptionHandler", ex);
+		return getExceptionResponseFromFeign(ex.contentUTF8());
+	}
+	
+	private ResponseEntity<Object> getExceptionResponseFromFeign(String message) {
+		ExceptionResponseDTO response;
+		try {
+			response = new ObjectMapper().readValue(message, ExceptionResponseDTO.class);
+		} catch (Exception e) {
+			response = new ExceptionResponseDTO(HttpStatus.BAD_REQUEST.value(),
+					Arrays.asList("Feign response inválido"));
+		}
+		return new ResponseEntity<>(response, HttpStatus.valueOf(response.getStatus()));
 	}
 
 	private List<FieldErrorDTO> getMessagesOfField(MethodArgumentNotValidException ex) {

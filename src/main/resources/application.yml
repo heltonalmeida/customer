@@ -13,3 +13,6 @@ spring:
     properties:
       hibernate:
         format_sql: true
+
+city:
+  baseURL: ${CITY_BASE_URL:http://localhost:5000/api/city}

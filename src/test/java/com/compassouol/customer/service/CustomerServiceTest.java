@@ -17,6 +17,8 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 
+import com.compassouol.customer.city.dto.CityResponseDTO;
+import com.compassouol.customer.city.feign.CityClientFeign;
 import com.compassouol.customer.dto.CustomerNameRequestDTO;
 import com.compassouol.customer.dto.CustomerRequestDTO;
 import com.compassouol.customer.dto.CustomerResponseDTO;
@@ -24,6 +26,8 @@ import com.compassouol.customer.enums.Sexo;
 import com.compassouol.customer.exception.CustomerNotFoundException;
 import com.compassouol.customer.model.Customer;
 import com.compassouol.customer.repository.CustomerRepository;
+
+import feign.FeignException;
 
 
 @RunWith(MockitoJUnitRunner.class)
@@ -34,6 +38,9 @@ public class CustomerServiceTest {
 	
 	@Mock
 	private CustomerRepository customerRepository;
+	
+	@Mock
+	private CityClientFeign cityClientFeign;
 	
 	@Test
 	public void findBy_mustReturnCustomerList() {
@@ -69,11 +76,21 @@ public class CustomerServiceTest {
 	public void save_mustSaveCustomer() {
 		CustomerRequestDTO customerRequestDTO = new CustomerRequestDTO("Helton", LocalDate.of(1994, Month.JUNE, 22), Sexo.M, 1l);
 		Customer customer = new Customer(1l, "Helton", LocalDate.of(1994, Month.JUNE, 22), Sexo.M, 1l);
+		CityResponseDTO cityResponseDTO = new CityResponseDTO(1l, "Juiz de Fora", "MG");
+		Mockito.when(cityClientFeign.findBy(Mockito.anyLong())).thenReturn(cityResponseDTO);
 		Mockito.when(customerRepository.save(Mockito.any())).thenReturn(customer);
 		
 		CustomerResponseDTO result = customerService.save(customerRequestDTO);
 		
 		Assert.assertNotNull(result);
+	}
+	
+	@Test(expected = FeignException.class)
+	public void save_mustThrowExceptionWhenCityNotFound() {
+		CustomerRequestDTO customerRequestDTO = new CustomerRequestDTO("Helton", LocalDate.of(1994, Month.JUNE, 22), Sexo.M, 1l);
+		Mockito.when(cityClientFeign.findBy(Mockito.anyLong())).thenThrow(FeignException.class);
+		
+		customerService.save(customerRequestDTO);
 	}
 	
 	@Test
