@@ -34,16 +34,16 @@ https://github.com/heltonalmeida/customer.git
 
 - Configurando SGBD
 
-Visto a aplicação utilizar o MySQL, podemos obter seu instalador atraves do [Download](https://www.mysql.com/downloads/) 
-ou tendo o [Docker](https://www.docker.com/) configurado, para obter uma instância execute o comando abaixo.  
+Visto a aplicação utilizar o MySQL, e caso ainda não tenha o mesmo instalado, podemos obter seu instalador atraves do [Download](https://www.mysql.com/downloads/) ou tendo o [Docker](https://www.docker.com/) configurado, para obter uma instância execute o comando abaixo.  
 
 ```
-docker run -it --name mysql -e MYSQL_ROOT_PASSWORD=root -p 3306:3306 -d mysql:8
+docker run -it -d --name mysql8-customer -p 3306:3306 hpalmeida/helton-mysql8-customer
 ```
+Para facilitar o acesso ou caso queira fazer alguma mudança na imagem, o arquivo Dockerfile que originou a imagem hpalmeida/helton-mysql8-customer encontra-se no caminho infra\docker a partir da raiz do projeto.
 
 Quanto a configuração das credencias para acesso ao banco, no arquivo application.yml já contém as configurações necessárias para a aplicação se conectar ao MySQL.
 
-Na primeira vez que estiver executando o projeto, através do Flayway será executado automaticamente no banco os scripts contidos no caminho src\main\resources\db para criação de tabela e massa de dados. Para que isso aconteça é necessário já ter criado o database tb_customer.
+Na primeira vez que estiver executando o projeto, através do Flayway será executado automaticamente no banco os scripts contidos no caminho src\main\resources\db para criação de tabela e massa de dados. Para que isso aconteça é necessário já ter criado o database tb_customer. Podendo ser pelo comando docker acima ou manualmente.
 
 - Comunicação com microsserviço CITY
 
