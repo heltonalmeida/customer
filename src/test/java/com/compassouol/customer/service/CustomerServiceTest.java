@@ -17,6 +17,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 
+import com.compassouol.customer.dto.CustomerNameRequestDTO;
 import com.compassouol.customer.dto.CustomerRequestDTO;
 import com.compassouol.customer.dto.CustomerResponseDTO;
 import com.compassouol.customer.enums.Sexo;
@@ -48,8 +49,8 @@ public class CustomerServiceTest {
 	@Test
 	public void findBy_mustReturnCustomer() {
 		Long id = 1l;
-		Customer city = new Customer(1l, "Helton", LocalDate.of(1994, Month.JUNE, 22), Sexo.M, 1l);
-		Mockito.when(customerRepository.findById(Mockito.anyLong())).thenReturn(Optional.of(city));
+		Customer customer = new Customer(1l, "Helton", LocalDate.of(1994, Month.JUNE, 22), Sexo.M, 1l);
+		Mockito.when(customerRepository.findById(Mockito.anyLong())).thenReturn(Optional.of(customer));
 		
 		CustomerResponseDTO result = customerService.findBy(id);
 		
@@ -78,12 +79,12 @@ public class CustomerServiceTest {
 	@Test
 	public void delete_mustDeleteCustomer() {
 		Long id = 1l;
-		Customer city = new Customer(1l, "Helton", LocalDate.of(1994, Month.JUNE, 22), Sexo.M, 1l);
-		Mockito.when(customerRepository.findById(Mockito.anyLong())).thenReturn(Optional.of(city));
+		Customer customer = new Customer(1l, "Helton", LocalDate.of(1994, Month.JUNE, 22), Sexo.M, 1l);
+		Mockito.when(customerRepository.findById(Mockito.anyLong())).thenReturn(Optional.of(customer));
 		
 		customerService.delete(id);
 		
-		Mockito.verify(customerRepository).deleteById(id);
+		Mockito.verify(customerRepository).delete(customer);
 	}
 	
 	@Test(expected = CustomerNotFoundException.class)
@@ -94,6 +95,29 @@ public class CustomerServiceTest {
 		customerService.delete(id);
 		
 		Mockito.verify(customerRepository).deleteById(id);
+	}
+	
+	@Test
+	public void updateName_mustUpdateName() {
+		Long id = 1l;
+		CustomerNameRequestDTO customerNameRequestDTO = new CustomerNameRequestDTO("Helton2");
+		Customer customer = new Customer(1l, "Helton", LocalDate.of(1994, Month.JUNE, 22), Sexo.M, 1l);
+		Mockito.when(customerRepository.findById(Mockito.anyLong())).thenReturn(Optional.of(customer));
+		Mockito.when(customerRepository.save(Mockito.any())).thenReturn(customer);
+		
+		CustomerResponseDTO result = customerService.updateName(id, customerNameRequestDTO);
+		
+		Assert.assertEquals(customerNameRequestDTO.getName(), result.getName());
+		
+	}
+	
+	@Test(expected = CustomerNotFoundException.class)
+	public void updateName_mustThrowExceptionWhenCustomerIsNotFound() {
+		Long id = 1l;
+		CustomerNameRequestDTO customerNameRequestDTO = new CustomerNameRequestDTO("Helton2");
+		Mockito.when(customerRepository.findById(Mockito.anyLong())).thenReturn(Optional.ofNullable(null));
+		
+		customerService.updateName(id, customerNameRequestDTO);
 	}
 
 }
